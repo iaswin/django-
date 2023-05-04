@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Image Upload Form</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+      }
+      form {
+        background-color: #fff;
+        max-width: 500px;
+        margin: 20px auto;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: bold;
+      }
+      input[type="file"] {
+        display: block;
+        margin-bottom: 20px;
+      }
+      input[type="submit"] {
+        background-color: #4caf50;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      input[type="submit"]:hover {
+        background-color: #3e8e41;
+      }
+    </style>
+  </head>
+  <body>
+    <form action="{%url 'upp' %}" method="post" enctype="multipart/form-data">
+        {%csrf_token%}
+      <label for="image">Select an image to upload:</label>
+      <input type="file" id="image" name="imgg">
+      <input type="submit" value="Upload">
+    </form>
+  </body>
+</html>
