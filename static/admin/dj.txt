@@ -1,0 +1,402 @@
+django tutorials
+
+
+1st create a folder
+
+install django:
+
+1st create a virtual environment:
+python -m venv myvenv
+
+-m : memory allocation
+
+activate the virtual environment:
+myvenv\Scripts\activate
+
+install django:
+pip install django
+
+
+
+then create the project:
+
+Django-admin startproject myproject .
+
+ fullstop -to avoid loop folder
+
+then create an application:
+python manage.py startapp myapp
+
+then open vscode by code .
+
+then open project setting.py then add application in it for install app
+
+INSTALLED_APPS = [
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    'myapp',
+]
+
+include application url in django project urls.py
+
+ist add include in library:
+
+from django.contrib import admin
+from django.urls import path,include
+
+then:
+ path("",include('myapp.urls'))
+
+then create urls.py in application and add :
+
+from django.urls import path,include
+
+urlpatterns = [
+    
+    
+]
+
+then migrate all django table to database:
+
+python manage.py migrate(create db.sqlite3)
+
+then create a superuser(used to access adminpanel):
+python manage.py createsuperuser
+
+
+then run server by: python manage.py runserver
+
+
+adding models:
+
+creating models:
+class ModelName(models.Model)
+models-django model
+Model-class name
+then add attribute:
+
+
+class Teacher(models.Model):
+    FirstName=models.CharField(max_length=10)
+    LastName=models.CharField(max_length=10)
+    Email=models.CharField(max_length=20)
+
+then make migration
+python manage.py makemigrations
+then migrate:python manage.py migrate
+
+add model in admin panel(admin.py):
+
+adfrom . models import *    -import all models
+min.site.register(Teacher)
+
+
+object to string in admin panel (in models.py):
+def __str__(self) -> str:
+        return self.FirstName
+
+then add html :
+app folder create template folder then create app folder then add html files
+
+then views.py
+def Index(request):
+    return render(request,"app/index.html")
+then in urls.py in application add its url:
+from .import views
+urlpatterns = [
+    path("",views.Index,name="Index"),
+    
+    
+]
+then makemigrations and migrate.
+add templates in dir in setting.py
+
+
+always link view with urls.py
+
+def index(request):
+    
+    return HttpResponse("hello")
+
+def about(request):
+    
+    return HttpResponse("hello")
+
+def booking(request):
+    
+    return HttpResponse("hello")
+
+def contact(request):
+    
+    return HttpResponse("hello")
+
+
+urls.py:
+
+ from django.urls import path,include
+from .import views
+urlpatterns = [
+    path("",views.index,name='home'),
+    path("about",views.about,name='about'),
+    path("booking",views.booking,name='booking'),
+    path("contact",views.contact,name='contact'),
+    
+]
+
+ name is used to reference to html page
+<a class="nav-link text-white" href="{%url 'home' %}">Home </a> name in views to access html href.
+
+
+Create a base html and by using extends it's property to another html page
+
+<title>{% block title %}{% endblock title %}</title>
+
+ {%block content%}
+    {%endblock%}
+
+changes happen's aboves only in base html
+
+<a class="nav-link text-white" href="{%url 'home' %}">Home </a>
+
+
+for static content(js,css,image):
+
+create folder static inside application folder and create another folder css
+
+in project folder setting.py
+
+STATICFILES_DIRS=[
+    os.path.join(BASE_DIR,'static')
+]
+ then base.html
+add :{%load  static %}
+
+<link rel="stylesheet"
+      href="{%static '/css/style.css'%}">
+
+ 
+CRUD Application
+
+connectivity with mysql
+
+create a database in wamp
+'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'database name',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '3306',
+    }
+
+    
+then migrate
+
+then install mysql client :pip install --only-binary :all mysqlclient
+
+then create a model it show in database
+
+
+class Teacher(models.Model):
+    FirstName=models.CharField(max_length=10)
+    LastName=models.CharField(max_length=10)
+    Email=models.CharField(max_length=20)
+
+then template add insert,show,edit.html
+insert to form to views:create a function in views (form name in post inside)
+
+
+
+def insertdata(request):
+    fname=request.POST['fname']
+    lname=request.POST['lname']
+    email=request.POST['emmail']
+
+create object of model in view.py
+
+from .models import *
+
+	newuser=Teacher.objects.create(FirstName=fname,LasttName=lname,Email=email) 
+	return render(request,"app/show.html")
+
+teacher-model name
+create- used to enter to database
+Firstname-model name
+fname-view name
+
+then add in urls.py
+and add that in form action.<form action="{%url 'insert' %}" method="post">
+ add {% csrf_token %} for security
+
+
+fetching data in django:
+all_data=Teacher.object.all()
+ return render(request,"app/show.html",{'key1':all_data}) to see in show.html
+
+
+in show.html changes should be made.
+
+then import redirect
+then change
+return redirect('insert')----->(view url name)
+
+
+updating database:
+in view.py
+
+def editpage(request,pk):
+    getdata=Teacher.objects.get(id=pk)   pk--primary key of which person to edit
+    return render(request,"app/edit.html",{'key2':getdata})
+
+
+by get method() updating database
+
+in urls.py
+path("edit/<int:pk>",views.editpage,name='edit'),
+
+in html:
+
+ <form name="editform" action="{%url 'edit' pk=i.id%}" method="post">
+
+def updatepage(request,pk):
+    udata=Teacher.objects.get(id=pk)
+    udata.FirstName=request.POST['fname']
+    udata.LastName=request.POST['lname']
+    udata.Email=request.POST['emmail']
+    
+    udata.save()
+
+
+updated by save() method
+
+then delete by: delete() method
+
+in view.py
+
+def delete(request,pk):
+    ddata=Teacher.objects.get(id=pk)
+    ddata.delete()
+    return redirect('show')---show the show html page
+
+in urls.py
+
+path("delete/<int:pk>",views.delete,name='delete'),
+
+user register in server side validation:
+
+1st create a register.html
+then create a model
+
+
+class User(models.Model):
+    FirstName=models.CharField(max_length=10)
+    LastName=models.CharField(max_length=10)
+    Email=models.CharField(max_length=20)
+    Password=models.CharField(max_length=20)
+
+IT SHOULD IN DATABASE
+
+check user and it validation code:
+
+def User(request):
+    if request.method=="POST":
+    fname=request.POST['fname']
+    lname=request.POST['lname']
+    email=request.POST['email']
+    password=request.POST['password']
+    cpassword=request.POST['cpassword']
+    
+    #validate for already exist
+    user=User.objects.filter(Email=email)
+    if user:
+        message="user already exist"
+        return render(request,"app/login.html",{'msg':message})
+    else:
+        if password==cpassword:
+            newuser=User.objects.create(FirstName=fname,LastName=lname,Email=email,Password=password)
+            message="user registered"
+            return render(request,"app/login.html",{'msg':message})
+        else:
+            message="check your password"
+            return render(request,"app/register.html",{'msg':message})
+
+
+
+
+then create a url:path("regi",views.User,name='regi'),
+
+
+
+for login page 1st do :
+create a views.py
+
+def Login(request):
+    return render(request,"app/login.html")
+
+
+def loguser(request):
+    if request.method=="POST":
+        email=request.POST['email']
+        password=request.POST['password']
+        user=Users.objects.get(Email=email)
+        
+        if user:
+            if user.Password==password:
+                request.session['FirstName']=user.FirstName
+                return render(request,"app/home.html")
+            else:
+                message="check your password"
+                return render(request,"app/login.html",{'msg':message})
+            
+        else:
+                message="user doesnt exit"
+                return render(request,"app/register.html",{'msg':message})
+
+
+image uploading:
+MEDIA_ROOT = os.path.join(BASE_DIR, 'data') # 'data' is my media folder
+MEDIA_URL = '/media/'
+
+class images(models.Model):
+    image=models.ImageField(upload_to="img/")
+pip install pillow
+
+def upload(request):
+    if request.method=="POST":
+        imgfile=request.FILES['imgg']
+        new=imagges.objects.create(image=imgfile)
+        return render(request,"app/show1.html")
+
+
+image fetching:
+in project
+urls.py add:
+
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import path,include
+
+
+urlpatterns = [
+    path("admin/", admin.site.urls),
+    path("",include('myapp.urls'))
+    
+    
+]
+if settings.DEBUG:
+        urlpatterns += static(settings.MEDIA_URL,
+                              document_root=settings.MEDIA_ROOT)
+
+
+javascript using django
+
+
+
+
+
+            
